@@ -1470,21 +1470,30 @@ function! phpcomplete_extended#updateIndex(background) "{{{
     if !phpcomplete_extended#is_phpcomplete_extended_project() || &ft != 'php'
         return
     endif
-    let file_location = phpcomplete_extended#util#substitute_path_separator(fnamemodify(bufname('%'), ':p:.')) "current file
+    let file_location = phpcomplete_extended#util#substitute_path_separator(
+          \ fnamemodify(bufname('%'), ':p:.')) "current file
     let update_time = getftime(bufname('%'))
     let fileName = 'update_cache_'. update_time
     let plugin_php_file_command = join(map(copy(s:plugin_php_files), '" -u ".v:val'))
-    let input = printf('%s %s %s %s', g:phpcomplete_extended_root_dir . "/bin/IndexGenerator.php update" , file_location,  fileName, plugin_php_file_command)
+    let input = printf('%s %s %s %s',
+          \ g:phpcomplete_extended_root_dir . "/bin/IndexGenerator.php update" ,
+          \ file_location,  fileName, plugin_php_file_command)
     let input = phpcomplete_extended#util#substitute_path_separator(input)
     let cmd = 'php '. input
 
-    if a:background
-        let cmd .= ' 1>/dev/null 2>&1'
-        call vimproc#system_bg(cmd)
-    else
-        let out =  vimproc#system(cmd)
-        echo out
-    endif
+    try
+      if a:background
+          " let cmd .= ' 1>/dev/null 2>&1'
+          call vimproc#system_bg(cmd)
+      else
+          let out =  vimproc#system(cmd)
+          echo out
+      endif
+    catch /^vimproc/
+      echohl Error
+      echomsg v:exception . ":" . cmd
+      echohl None
+    endtry
 
     let s:update_info['update_available'] = 1
     let s:update_info['update_time'] = update_time
