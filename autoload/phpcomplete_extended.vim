@@ -334,7 +334,7 @@ function! s:getFQCNFromTokens(parsedTokens, currentFQCN, isThis) "{{{
 
     let isPrevTokenArray = 0
 
-    if currentFQCN =~  '\[\]$' && len(parsedTokens) 
+    if currentFQCN =~  '\[\]$' && len(parsedTokens)
                 \ && has_key(parsedTokens[0], 'isArrayElement')
         let currentFQCN = matchstr(currentFQCN, '\zs.*\ze\[\]$')
         let isPrevTokenArray = 1
@@ -345,16 +345,16 @@ function! s:getFQCNFromTokens(parsedTokens, currentFQCN, isThis) "{{{
         let insideBraceText = token['insideBraceText']
         let isArrayElement = has_key(token, 'isArrayElement')? 1 :0
         let currentClassData = phpcomplete_extended#getClassData(currentFQCN)
-        
+
         let  pluginFQCN = s:get_plugin_fqcn(currentFQCN,token)
 
         if insideBraceText[0] == "("
             let currentFQCN = ""
         elseif pluginFQCN != ""
             let currentFQCN = pluginFQCN
-        elseif isArrayElement 
+        elseif isArrayElement
             let isPrevTokenArray = 0
-            if phpcomplete_extended#isClassOfType(currentFQCN, 'ArrayAccess') 
+            if phpcomplete_extended#isClassOfType(currentFQCN, 'ArrayAccess')
                     \ && has_key(currentClassData['methods']['all'], 'offsetGet')
                 let offsetType = currentClassData['methods']['all']['offsetGet']['return']
                 if empty(offsetType)
@@ -491,6 +491,9 @@ function! phpcomplete_extended#trackMenuChanges() "{{{
             call feedkeys("\<C-o>l")
         else
             call setpos(".", prev_pos)
+        endif
+        if type(g:phpcomplete_index) != type({})
+            return
         endif
         let fqcn = ""
         if match(cur_word, '-') > 0
@@ -854,7 +857,7 @@ function! phpcomplete_extended#parsereverse(cursorLine, cursorLineNumber) "{{{
     let parsedTokens = phpcomplete_extended#parser#reverseParse(cursorLine, [])
 
 
-    if empty(parsedTokens) 
+    if empty(parsedTokens)
             \ || (len(parsedTokens) && has_key(parsedTokens[0], 'start') && parsedTokens[0].start == 0)
         let linesTillFunc = s:getLinesTilFunc(a:cursorLineNumber)
         let joinedLines = join(reverse(linesTillFunc),"")
@@ -1507,7 +1510,7 @@ function! phpcomplete_extended#checkUpdates() "{{{
         if filereadable(update_file)
             try
                 let updateData = s:readIndex(update_file)
-            catch 
+            catch
                 echoerr "Error occured while reading update index"
                 return
             endtry

@@ -55,7 +55,7 @@ function! s:get_complete_position(context) "{{{
 endfunction "}}}
 
 function! s:gather_candidates(context) "{{{
-    return phpcomplete_extended#CompletePHP(0, b:completeContext.base)
+    return phpcomplete_extended#CompletePHP(0, get(b:completeContext, 'base', ""))
 endfunction "}}}
 
 function! neocomplete#sources#php#define() "{{{
@@ -82,4 +82,4 @@ augroup END
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: foldmethod=marker:expandtab:ts=4:sts=4:tw=78 
+" vim: foldmethod=marker:expandtab:ts=4:sts=4:tw=78

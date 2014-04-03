@@ -43,7 +43,7 @@ if(php_sapi_name() == 'cli') {
             $verbose = true;
         }
 
-        //$time = microtime(true); 
+        //$time = microtime(true);
         $phpCompletePsr  = new IndexGenerator($verbose);
 
         $plugins = explode("-u", implode("", $argv));
@@ -129,7 +129,7 @@ class IndexGenerator
     private $file_fqcn;
 
     /**
-     * 
+     *
      *
      * @var array
      */
@@ -147,14 +147,14 @@ class IndexGenerator
 
     /**
      * List of valid files
-     * @var array 
+     * @var array
      */
     private $validFiles;
 
     /**
-     * 
      *
-     * @var array 
+     *
+     * @var array
      */
     private $invalidClasses;
 
@@ -182,7 +182,7 @@ class IndexGenerator
     /**
      * list of parsed classes
      *
-     * @var array 
+     * @var array
      */
     private $parsedClasses;
 
@@ -198,7 +198,7 @@ class IndexGenerator
      */
     private $coreIndexFile;
     /**
-     * 
+     *
      *
      * @var string
      */
@@ -219,7 +219,7 @@ class IndexGenerator
      */
     private $verbose;
 
-    public function __construct($verbose) 
+    public function __construct($verbose)
     {
         $this->file_fqcn        = array();
         $this->fqcn_file        = array();
@@ -255,7 +255,7 @@ class IndexGenerator
     /**
      * calls plugin hooks
      * @param string $hookName name of the plugin hook
-     * @param bool $return expect return date 
+     * @param bool $return expect return date
      */
     public function execHook($hookName, $return)
     {
@@ -285,12 +285,12 @@ class IndexGenerator
         }
     }
 
-    public function writeUpdatedClassInfo($fileName, $cacheFileName) 
+    public function writeUpdatedClassInfo($fileName, $cacheFileName)
     {
         $time = microtime(true);
         $this->processCoreIndexFile();
         $fileName        = $this->normalizePath($fileName);
-        $classCache      = json_decode(file_get_contents($this->indexFileName), true);
+        $classCache      = $this->readIndexFile();
         $extends         = $classCache['extends'];
         $implements      = $classCache['implements'];
         $this->fqcn_file = $classCache['fqcn_file'];
@@ -302,7 +302,7 @@ class IndexGenerator
         } else{
             $pluginIndex     = json_decode(file_get_contents($this->pluginIndexFile), true);
         }
-        
+
         $this->execHook("init", false, $this->loader);
         $this->execHook("preUpdateIndex", false, $pluginIndex);
 
@@ -409,7 +409,7 @@ class IndexGenerator
         return $path;
     }
 
-    public function generateIndex() 
+    public function generateIndex()
     {
         $this->processCoreIndexFile();
         $time = microtime(true); // Gets microseconds
@@ -457,7 +457,7 @@ class IndexGenerator
 
             if(
                 !array_key_exists('PHPUnit_Framework_TestCase', $this->fqcn_file) &&
-                (preg_match('/Test/',$file) 
+                (preg_match('/Test/',$file)
                 || preg_match('/TestCase/'         , $file)
                 || preg_match('/0/'                , $fqcn)
                 || preg_match('/Fixtures/'         , $file)
@@ -610,7 +610,7 @@ class IndexGenerator
         return $merge;
     }
 
-    private function mergeClassProperties($baseProperties, $parentProperties) 
+    private function mergeClassProperties($baseProperties, $parentProperties)
     {
         if(empty($parentProperties)) {
             return $baseProperties;
@@ -780,7 +780,7 @@ class IndexGenerator
             return $classData;
         }
 
-        if($reflectionClass->isInternal()) { 
+        if($reflectionClass->isInternal()) {
             $fqcn = $reflectionClass->getName();
             if(array_key_exists($fqcn, $this->coreIndex['classes'])) {
                 return $this->coreIndex['classes'][$reflectionClass->getName()];
@@ -829,7 +829,7 @@ class IndexGenerator
 
         $this->getConstantData($reflectionClass, $classData);
 
-        $classMethods = $reflectionClass->getMethods(); 
+        $classMethods = $reflectionClass->getMethods();
 
         foreach($classMethods as $reflectionMethod) {
             if($reflectionMethod->class === $fqcn) {
@@ -856,7 +856,7 @@ class IndexGenerator
         return $classData;
     }
 
-    private function getMethodData(ReflectionMethod $reflectionMethod, $classContent, &$classData) 
+    private function getMethodData(ReflectionMethod $reflectionMethod, $classContent, &$classData)
     {
         //TODO: parse local variable
         $modifiers  = Reflection::getModifierNames($reflectionMethod->getModifiers());
@@ -972,7 +972,7 @@ class IndexGenerator
             if(empty($splits)) {
                 continue;
             }
-            if($type=='method'){         
+            if($type=='method'){
                 switch ($splits[0]) {
                 case '@param':
                     if(count($splits) == 1) {
@@ -991,7 +991,7 @@ class IndexGenerator
                 case '@inheritdoc':
                     $out['inheritdoc'] = 1;
                     break;
-                } 
+                }
             } else if($type == 'property') {
                 if($splits[0] == '@var') {
                     if(count($splits) < 2) {
@@ -1059,7 +1059,7 @@ class IndexGenerator
         }
 
         $aliasReverse = array_flip($namespaces['alias']);
-        if(array_key_exists($classToken, $namespaces['uses']) && !array_key_exists($classToken, $aliasReverse)){ //in uses 
+        if(array_key_exists($classToken, $namespaces['uses']) && !array_key_exists($classToken, $aliasReverse)){ //in uses
             if(array_key_exists($classToken, $namespaces['alias'])) {
                 $fqcn = $namespaces['uses'][$classToken];
             }  else {
@@ -1145,7 +1145,7 @@ class IndexGenerator
     }
 
 
-    private function getEmptyMergeProperty() 
+    private function getEmptyMergeProperty()
     {
         return array(
             'methods' => array(
@@ -1228,15 +1228,15 @@ class IndexGenerator
             'uses' => array(),
             'alias' => array(),
         );
-        
+
         $classData['constants'] = array();
 
         return $classData;
     }
 
-    private function isScalar($type) 
+    private function isScalar($type)
     {
-        $scalarsTypes = array('boolean', 'integer','float', 'string', 'array', 'object', 
+        $scalarsTypes = array('boolean', 'integer','float', 'string', 'array', 'object',
             'resource', 'mixed', 'number', 'callback', 'null', 'void', 'bool', 'self', 'int', 'callable');
         return in_array(strtolower($type), $scalarsTypes);
     }
@@ -1304,7 +1304,7 @@ class IndexGenerator
         return $this;
     }
 
-    public function writeToFile($fileName, $data) 
+    public function writeToFile($fileName, $data)
     {
         file_put_contents($fileName, $data);
     }
@@ -1324,7 +1324,7 @@ class IndexGenerator
      *
      * @param string $invalidClasses invalid class list
      *
-     * @return 
+     * @return
      */
     public function setInvalidClasses($invalidClasses)
     {
@@ -1388,9 +1388,9 @@ class IndexGenerator
 
             if(!$isMultiLine && !$isClassLine && !$isConstructorLine &&
                 (
-                    preg_match("/^\s*namespace/", $line) 
-                    || preg_match("/^\s*use/", $line) 
-                    || preg_match("/^\s*(abstract|final)?\s*(class|interface)/", $line) 
+                    preg_match("/^\s*namespace/", $line)
+                    || preg_match("/^\s*use/", $line)
+                    || preg_match("/^\s*(abstract|final)?\s*(class|interface)/", $line)
                     || preg_match("/^\s*interface/", $line)
                     || preg_match("/^\s*public\s+function\s+__construct/", $line)
                 )
@@ -1460,7 +1460,7 @@ class IndexGenerator
         $implements = array();
         $constructorArguments = array();
         $classNameregex = "/^\s*(abstract|final)?(\s+)?(class)\s+([\\\\,\w]+)(\s+extends\s+([\\\\\w]+))?(\s+implements\s+([^{]*))?/";
-        $interfaceRegex = "/^\s*interface\s+([\\\\,\w]+)(\s+extends(.*))?/"; 
+        $interfaceRegex = "/^\s*interface\s+([\\\\,\w]+)(\s+extends(.*))?/";
         $constructorRegex = "/^\s*public\s+function\s+__construct\((.*)\)/";
         $classContent = file($fileName);
         $formattedClassContent = $this->formatClassContent($classContent);
@@ -1523,7 +1523,7 @@ class IndexGenerator
                 if(!empty($matches[8])) {
                     $classImplements = explode(",", $matches[8]);
                     foreach($classImplements as $implement) { //implements
-                        if(empty($implement)) { 
+                        if(empty($implement)) {
                             continue;
                         }
                         $implement = trim($implement, " \n\r{");
@@ -1612,7 +1612,7 @@ class IndexGenerator
                 'implements' => $implements,
                 'extends' => $extends,
                 'classname' => $className
-            ), 
+            ),
             'constructor_arguments' =>  $constructorArguments
         );
         //ldd($parsedData);
@@ -1623,7 +1623,7 @@ class IndexGenerator
     /**
      * Gets the value of coreIndex
      *
-     * @return array 
+     * @return array
      */
     public function getCoreIndex()
     {
@@ -1633,9 +1633,9 @@ class IndexGenerator
     /**
      * Sets the value of coreIndex
      *
-     * @param array  $coreIndex 
+     * @param array  $coreIndex
      *
-     * @return this 
+     * @return this
      */
     public function setCoreIndex($coreIndex)
     {
@@ -1646,7 +1646,7 @@ class IndexGenerator
     /**
      * Gets the value of coreIndexFile
      *
-     * @return string 
+     * @return string
      */
     public function getCoreIndexFile()
     {
@@ -1656,9 +1656,9 @@ class IndexGenerator
     /**
      * Sets the value of coreIndexFile
      *
-     * @param string  $coreIndexFile 
+     * @param string  $coreIndexFile
      *
-     * @return this 
+     * @return this
      */
     public function setCoreIndexFile($coreIndexFile)
     {
@@ -1669,6 +1669,19 @@ class IndexGenerator
     public function processCoreIndexFile()
     {
         $this->coreIndex = json_decode(file_get_contents($this->coreIndexFile), true);
+    }
+
+    public function readIndexFile() {
+        if (is_file($this->indexFileName)) {
+            return json_decode(file_get_contents($this->indexFileName), true);
+        }
+        return array(
+            "extends" => array(),
+            "implements" => array(),
+            "fqcn_file" => array(),
+            "file_fqcn" => array(),
+            "class_fqcn" => array(),
+        );
     }
 }
 
