@@ -1284,6 +1284,9 @@ function! s:loadIndex() " {{{
     let plugin_index_file = s:getPluginIndexFileName()
 
     if !filereadable(index_file)
+        if g:phpcomplete_no_auto_project_detection
+            return
+        endif
         let initial_message = "Composer project detected, Do you want to create index?"
         let ret = phpcomplete_extended#util#input_yesno(initial_message)
         if !ret

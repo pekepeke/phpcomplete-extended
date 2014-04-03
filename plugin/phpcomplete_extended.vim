@@ -45,6 +45,9 @@ endif
 
 let g:loaded_phpcomplete_extended = 1
 
+let g:phpcomplete_no_auto_project_detection =
+      \ get(g:, 'phpcomplete_no_auto_project_detection', 0)
+
 let g:phpcomplete_extended_tags_cache_dir =
       \ get(g:, 'phpcomplete_extended_tags_cache_dir', expand('~/.phpcomplete_extended'))
 
